@@ -25,25 +25,23 @@ export default function BackgroundLayout({ imageUrls, children }: BackgroundLayo
   }, [bgImage]);
 
   return (
-    <div className="relative min-h-screen">
-      {/* Layer 1: Solid fallback color */}
-      <div className="fixed inset-0 -z-20 bg-bg-light dark:bg-bg-dark" />
+    <div className="relative min-h-screen overflow-hidden">
+      {/* Fallback color */}
+      <div className="fixed inset-0 bg-bg-light dark:bg-bg-dark" />
 
-      {/* Layer 2: Background image - URL ALWAYS set, opacity controls visibility.
-          This lets the browser precompute bg-cover layout before the image loads,
-          preventing the "resize" flash when the image appears. */}
-      <div
-        className="fixed inset-0 -z-10 bg-cover bg-center bg-no-repeat"
-        style={{
-          backgroundImage: `url(${bgImage})`,
-          opacity: loaded ? 1 : 0,
-        }}
+      {/* Background image: <img> + object-fit:cover instead of CSS background-image
+          to prevent "cover resize jump" during async image decode */}
+      <img
+        src={bgImage}
+        alt=""
+        aria-hidden="true"
+        className={`fixed inset-0 h-full w-full object-cover transition-opacity duration-300 ${loaded ? 'opacity-100' : 'opacity-0'}`}
       />
 
-      {/* Layer 3: Overlay */}
+      {/* Overlay */}
       <div className="fixed inset-0 bg-white/50 dark:bg-black/70" />
 
-      {/* Layer 4: Content */}
+      {/* Content */}
       <div className="relative z-10">
         {children}
       </div>
