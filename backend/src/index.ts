@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import { env } from './config/env.js';
 import { errorHandler } from './middleware/errorHandler.js';
+import authRoutes from './routes/auth.js';
 import type { ApiResponse } from './types/api.js';
 
 const app = express();
@@ -28,6 +29,9 @@ app.get('/health', (_req, res) => {
   };
   res.json(response);
 });
+
+// Routes
+app.use('/api/auth', authRoutes);
 
 // Error handler (must be last)
 app.use(errorHandler);
