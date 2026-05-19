@@ -7,6 +7,7 @@ import { errorHandler } from './middleware/errorHandler.js';
 import authRoutes from './routes/auth.js';
 import postRoutes from './routes/posts.js';
 import tagRoutes from './routes/tags.js';
+import commentRoutes from './routes/comments.js';
 import type { ApiResponse } from './types/api.js';
 
 const app = express();
@@ -36,6 +37,7 @@ app.get('/health', (_req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/api/tags', tagRoutes);
+app.use('/api/comments', commentRoutes);
 
 // Error handler (must be last)
 app.use(errorHandler);
