@@ -26,18 +26,24 @@ export default function BackgroundLayout({ imageUrls, children }: BackgroundLayo
 
   return (
     <div className="relative min-h-screen">
-      {/* Background: single div, no backdrop-blur, no transitions */}
+      {/* Layer 1: Solid fallback color */}
+      <div className="fixed inset-0 -z-20 bg-bg-light dark:bg-bg-dark" />
+
+      {/* Layer 2: Background image - URL ALWAYS set, opacity controls visibility.
+          This lets the browser precompute bg-cover layout before the image loads,
+          preventing the "resize" flash when the image appears. */}
       <div
-        className="fixed inset-0 -z-10 bg-cover bg-center bg-no-repeat bg-bg-light dark:bg-bg-dark"
+        className="fixed inset-0 -z-10 bg-cover bg-center bg-no-repeat"
         style={{
-          backgroundImage: loaded ? `url(${bgImage})` : 'none',
+          backgroundImage: `url(${bgImage})`,
+          opacity: loaded ? 1 : 0,
         }}
       />
 
-      {/* Overlay: single div with dark: variant, no transitions */}
-      <div className="fixed inset-0 -z-10 bg-white/50 dark:bg-black/70" />
+      {/* Layer 3: Overlay */}
+      <div className="fixed inset-0 bg-white/50 dark:bg-black/70" />
 
-      {/* Content */}
+      {/* Layer 4: Content */}
       <div className="relative z-10">
         {children}
       </div>
