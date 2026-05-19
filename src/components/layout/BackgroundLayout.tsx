@@ -35,8 +35,11 @@ export default function BackgroundLayout({ imageUrls, children }: BackgroundLayo
         style={{ backgroundImage: `url(${bgImage})` }}
       />
 
-      {/* Overlay */}
-      <div className="fixed inset-0 bg-white/20 dark:bg-black/70 backdrop-blur-sm transition-colors duration-300" />
+      {/* Overlay - light mode: wash out image to near-white */}
+      <div className="fixed inset-0 bg-white/50 backdrop-blur-sm dark:hidden transition-colors duration-300" />
+
+      {/* Overlay - dark mode: darken image significantly */}
+      <div className="fixed inset-0 bg-black/70 backdrop-blur-sm hidden dark:block transition-colors duration-300" />
 
       {/* Content */}
       <div className="relative z-10">
