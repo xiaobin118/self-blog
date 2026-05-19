@@ -26,20 +26,28 @@ export default function BackgroundLayout({ imageUrls, children }: BackgroundLayo
 
   return (
     <div className="relative min-h-screen">
-      {/* Fallback background */}
+      {/* Solid fallback - matches overlay color, no flash */}
       <div className="fixed inset-0 bg-bg-light dark:bg-bg-dark transition-colors duration-300" />
 
-      {/* Background image */}
+      {/* Background image - opacity via inline style to avoid Tailwind transition conflict */}
       <div
-        className={`fixed inset-0 bg-cover bg-center bg-no-repeat transition-opacity duration-500 ${loaded ? 'opacity-100' : 'opacity-0'}`}
-        style={{ backgroundImage: `url(${bgImage})` }}
+        className="fixed inset-0 bg-cover bg-center bg-no-repeat will-change-[opacity]"
+        style={{
+          backgroundImage: `url(${bgImage})`,
+          opacity: loaded ? 1 : 0,
+          transition: 'opacity 0.5s ease',
+        }}
       />
 
-      {/* Overlay - light mode: wash out image to near-white */}
-      <div className="fixed inset-0 bg-white/50 backdrop-blur-sm dark:hidden transition-colors duration-300" />
-
-      {/* Overlay - dark mode: darken image significantly */}
-      <div className="fixed inset-0 bg-black/70 backdrop-blur-sm hidden dark:block transition-colors duration-300" />
+      {/* Overlay - only apply backdrop-blur after image loads to prevent recalculation flicker */}
+      <div
+        className="fixed inset-0 bg-white/50 dark:hidden transition-colors duration-300"
+        style={{ backdropFilter: loaded ? 'blur(4px)' : 'none' }}
+      />
+      <div
+        className="fixed inset-0 bg-black/70 hidden dark:block transition-colors duration-300"
+        style={{ backdropFilter: loaded ? 'blur(4px)' : 'none' }}
+      />
 
       {/* Content */}
       <div className="relative z-10">

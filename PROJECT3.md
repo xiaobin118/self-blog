@@ -5,3 +5,15 @@ Problem:
 
     参考https://blog.yuuzi.cc/ 的博客，换主题时背景颜色也有明显变化, finish Dark mode
 
+## Bug 4: 进入页面时背景闪烁（尺寸变化）
+
+进入页面时，背景图会出现闪烁现象，表现为尺寸突然变化。可能原因：
+- 背景图加载过程中 `opacity` 从 0 到 1 的过渡与 CSS transition 冲突
+- `backdrop-blur` 在图片加载时重新计算导致重绘
+- 固定定位的背景层在页面切换时布局抖动
+
+请修复 BackgroundLayout.tsx，确保：
+- 背景图加载过程平滑无闪烁
+- 页面切换时背景过渡自然
+- 不出现任何尺寸跳变
+
