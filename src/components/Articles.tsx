@@ -1,7 +1,7 @@
-import { useState, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { posts } from '../data/posts';
+import { postsApi, type ApiPost, type PaginatedData } from '../api/client';
 
 interface ArticlesProps {
   searchQuery?: string;
@@ -26,78 +26,86 @@ const itemVariants = {
 
 export default function Articles({ searchQuery = '', selectedTag = '', onSearchChange }: ArticlesProps) {
   const [currentPage, setCurrentPage] = useState(1);
+  const [data, setData] = useState<PaginatedData<ApiPost> | null>(null);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const filtered = useMemo(() => {
-    return posts.filter(post => {
-      const matchesSearch = searchQuery
-        ? post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          post.summary.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          post.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
-        : true;
-      const matchesTag = selectedTag
-        ? post.tags.some(tag => tag === selectedTag)
-        : true;
-      return matchesSearch && matchesTag;
-    });
-  }, [searchQuery, selectedTag]);
-
-  const totalPages = Math.max(1, Math.ceil(filtered.length / ITEMS_PER_PAGE));
-  const safePage = Math.min(currentPage, totalPages);
-  const paginated = filtered.slice((safePage - 1) * ITEMS_PER_PAGE, safePage * ITEMS_PER_PAGE);
-
-  // Reset to page 1 when filters change
-  useMemo(() => {
+  useEffect(() => {
     setCurrentPage(1);
   }, [searchQuery, selectedTag]);
+
+  useEffect(() => {
+    setLoading(true);
+    postsApi.getList({
+      page: currentPage,
+      limit: ITEMS_PER_PAGE,
+      q: searchQuery || undefined,
+      tag: selectedTag || undefined,
+    }).then(res => {
+      if (res.success && res.data) setData(res.data);
+    }).catch(() => {}).finally(() => setLoading(false));
+  }, [currentPage, searchQuery, selectedTag]);
+
+  const posts = data?.items ?? [];
+  const totalPages = data?.totalPages ?? 1;
 
   return (
     <div className="flex flex-col gap-4">
       {/* Search bar */}
       <SearchBar
         searchQuery={searchQuery}
-        resultCount={filtered.length}
+        resultCount={data?.total ?? 0}
         onSearchChange={onSearchChange}
       />
 
       {/* Article list */}
       <AnimatePresence mode="wait">
-        {paginated.length > 0 ? (
+        {loading ? (
           <motion.div
-            key={`page-${safePage}-${searchQuery}-${selectedTag}`}
+            key="loading"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="text-center py-12 text-text-light dark:text-text-dark"
+          >
+            加载中...
+          </motion.div>
+        ) : posts.length > 0 ? (
+          <motion.div
+            key={`page-${currentPage}-${searchQuery}-${selectedTag}`}
             variants={containerVariants}
             initial="hidden"
             animate="visible"
             exit="hidden"
             className="flex flex-col gap-4"
           >
-            {paginated.map(post => (
+            {posts.map(post => (
               <motion.article
                 key={post.id}
                 variants={itemVariants}
                 className="bg-card-light dark:bg-card-dark rounded-2xl p-6 border border-border-light dark:border-border-dark hover:shadow-lg transition-all duration-300 cursor-pointer group"
                 whileHover={{ scale: 1.01 }}
                 whileTap={{ scale: 0.99 }}
-                onClick={() => navigate(`/post/${post.id}`)}
+                onClick={() => navigate(`/post/${post.slug}`)}
               >
                 <div className="flex items-start justify-between gap-4 mb-2">
                   <h3 className="text-lg font-semibold text-heading-light dark:text-heading-dark group-hover:text-accent-light dark:group-hover:text-accent-dark transition-colors duration-300">
                     {post.title}
                   </h3>
                   <time className="text-sm text-text-light dark:text-text-dark shrink-0">
-                    {post.date}
+                    {post.publishedAt ? new Date(post.publishedAt).toLocaleDateString('zh-CN') : ''}
                   </time>
                 </div>
                 <p className="text-sm text-text-light dark:text-text-dark mb-3 line-clamp-2">
                   {post.summary}
                 </p>
                 <div className="flex flex-wrap gap-2">
-                  {post.tags.map(tag => (
+                  {post.tags.map(({ tag }) => (
                     <span
-                      key={tag}
+                      key={tag.id}
                       className="px-2.5 py-0.5 text-xs rounded-full bg-accent-light/10 dark:bg-accent-dark/10 text-accent-light dark:text-accent-dark border border-accent-light/20 dark:border-accent-dark/20 transition-colors duration-300"
                     >
-                      {tag}
+                      {tag.name}
                     </span>
                   ))}
                 </div>
@@ -120,7 +128,7 @@ export default function Articles({ searchQuery = '', selectedTag = '', onSearchC
       {/* Pagination */}
       {totalPages > 1 && (
         <Pagination
-          currentPage={safePage}
+          currentPage={currentPage}
           totalPages={totalPages}
           onPageChange={setCurrentPage}
         />

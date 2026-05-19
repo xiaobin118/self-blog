@@ -2,6 +2,9 @@ import { useState } from 'react';
 import { NavLink, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '../../context/ThemeContext';
+import { useAuth } from '../../context/AuthContext';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
 
 interface NavItem {
   to: string;
@@ -120,6 +123,42 @@ function SearchButton() {
   );
 }
 
+function UserMenu() {
+  const { user, logout, isAdmin } = useAuth();
+
+  if (user) {
+    return (
+      <div className="flex items-center gap-2">
+        <img src={user.avatarUrl} alt="" className="w-6 h-6 rounded-full" />
+        <span className="text-sm text-text-light dark:text-text-dark hidden sm:inline">{user.username}</span>
+        {isAdmin && (
+          <Link
+            to="/admin/new"
+            className="text-xs px-2 py-1 rounded bg-accent-light/10 dark:bg-accent-dark/10 text-accent-light dark:text-accent-dark hover:bg-accent-light/20 dark:hover:bg-accent-dark/20 transition-colors"
+          >
+            New Post
+          </Link>
+        )}
+        <button
+          onClick={logout}
+          className="text-xs text-text-light dark:text-text-dark hover:text-red-500 transition-colors cursor-pointer"
+        >
+          Logout
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <a
+      href={`${API_BASE_URL}/api/auth/github`}
+      className="text-sm text-text-light dark:text-text-dark hover:text-heading-light dark:hover:text-heading-dark transition-colors"
+    >
+      Login
+    </a>
+  );
+}
+
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -141,10 +180,13 @@ export default function Navbar() {
           <div className="w-px h-6 bg-border-light dark:bg-border-dark mx-2" />
           <SearchButton />
           <ThemeToggle />
+          <div className="w-px h-6 bg-border-light dark:bg-border-dark mx-2" />
+          <UserMenu />
         </div>
 
         {/* Mobile Menu Button */}
         <div className="flex md:hidden items-center gap-2">
+          <UserMenu />
           <ThemeToggle />
           <motion.button
             onClick={() => setMenuOpen(prev => !prev)}

@@ -1,35 +1,43 @@
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { getAllTags } from '../../data/posts';
+import { tagsApi, type ApiTag } from '../../api/client';
 
 interface AsideProps {
   selectedTag?: string;
   onTagSelect?: (tag: string) => void;
 }
 
-const tags = getAllTags();
-
 export default function Aside({ selectedTag, onTagSelect }: AsideProps) {
+  const [tags, setTags] = useState<ApiTag[]>([]);
+
+  useEffect(() => {
+    tagsApi.getAll().then(res => {
+      if (res.success && res.data) setTags(res.data);
+    }).catch(() => {});
+  }, []);
+
   return (
     <aside className="w-full lg:w-[280px] lg:shrink-0">
       {/* Desktop: sticky sidebar */}
       <div className="hidden lg:block sticky top-20">
-        <ProfileCard selectedTag={selectedTag} onTagSelect={onTagSelect} />
+        <ProfileCard tags={tags} selectedTag={selectedTag} onTagSelect={onTagSelect} />
       </div>
 
       {/* Mobile: horizontal scrolling card */}
       <div className="lg:hidden">
-        <MobileProfileCard selectedTag={selectedTag} onTagSelect={onTagSelect} />
+        <MobileProfileCard tags={tags} selectedTag={selectedTag} onTagSelect={onTagSelect} />
       </div>
     </aside>
   );
 }
 
 interface ProfileCardProps {
+  tags: ApiTag[];
   selectedTag?: string;
   onTagSelect?: (tag: string) => void;
 }
 
-function ProfileCard({ selectedTag, onTagSelect }: ProfileCardProps) {
+function ProfileCard({ tags, selectedTag, onTagSelect }: ProfileCardProps) {
   return (
     <div className="bg-card-light dark:bg-card-dark rounded-2xl p-6 border border-border-light dark:border-border-dark transition-colors duration-300">
       {/* Avatar */}
@@ -59,10 +67,10 @@ function ProfileCard({ selectedTag, onTagSelect }: ProfileCardProps) {
       {/* Tags */}
       <div className="flex flex-wrap gap-2 justify-center">
         {tags.map(tag => {
-          const isActive = selectedTag === tag;
+          const isActive = selectedTag === tag.name;
           return (
             <motion.button
-              key={tag}
+              key={tag.id}
               className={`px-3 py-1 text-xs rounded-full border cursor-pointer transition-colors duration-300 ${
                 isActive
                   ? 'bg-accent-light dark:bg-accent-dark text-white border-accent-light dark:border-accent-dark'
@@ -70,9 +78,9 @@ function ProfileCard({ selectedTag, onTagSelect }: ProfileCardProps) {
               }`}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              onClick={() => onTagSelect?.(tag === selectedTag ? '' : tag)}
+              onClick={() => onTagSelect?.(tag.name === selectedTag ? '' : tag.name)}
             >
-              {tag}
+              {tag.name}
             </motion.button>
           );
         })}
@@ -81,7 +89,7 @@ function ProfileCard({ selectedTag, onTagSelect }: ProfileCardProps) {
   );
 }
 
-function MobileProfileCard({ selectedTag, onTagSelect }: ProfileCardProps) {
+function MobileProfileCard({ tags, selectedTag, onTagSelect }: ProfileCardProps) {
   return (
     <div className="bg-card-light dark:bg-card-dark rounded-2xl p-4 border border-border-light dark:border-border-dark transition-colors duration-300 mb-4">
       <div className="flex items-center gap-4">
@@ -112,10 +120,10 @@ function MobileProfileCard({ selectedTag, onTagSelect }: ProfileCardProps) {
       <div className="mt-3 overflow-x-auto scrollbar-hide">
         <div className="flex gap-2 pb-1">
           {tags.map(tag => {
-            const isActive = selectedTag === tag;
+            const isActive = selectedTag === tag.name;
             return (
               <motion.button
-                key={tag}
+                key={tag.id}
                 className={`px-3 py-1 text-xs rounded-full whitespace-nowrap border cursor-pointer transition-colors duration-300 ${
                   isActive
                     ? 'bg-accent-light dark:bg-accent-dark text-white border-accent-light dark:border-accent-dark'
@@ -123,9 +131,9 @@ function MobileProfileCard({ selectedTag, onTagSelect }: ProfileCardProps) {
                 }`}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                onClick={() => onTagSelect?.(tag === selectedTag ? '' : tag)}
+                onClick={() => onTagSelect?.(tag.name === selectedTag ? '' : tag.name)}
               >
-                {tag}
+                {tag.name}
               </motion.button>
             );
           })}

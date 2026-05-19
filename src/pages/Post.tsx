@@ -1,9 +1,11 @@
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { getPostById } from '../data/posts';
+import { postsApi, type ApiPost } from '../api/client';
 import BackgroundLayout from '../components/layout/BackgroundLayout';
+import CommentSection from '../components/CommentSection';
 
 const homeImages = [
   '/image/home/woman_with_a_parasol_-_madame_monet_and_her_son_1983.1.29.jpg',
@@ -13,8 +15,32 @@ const homeImages = [
 ];
 
 export default function Post() {
-  const { id } = useParams<{ id: string }>();
-  const post = getPostById(Number(id));
+  const { slug } = useParams<{ slug: string }>();
+  const [post, setPost] = useState<ApiPost | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!slug) return;
+    setLoading(true);
+    postsApi.getBySlug(slug)
+      .then(res => {
+        if (res.success && res.data) setPost(res.data);
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [slug]);
+
+  if (loading) {
+    return (
+      <BackgroundLayout imageUrls={homeImages}>
+        <div className="max-w-4xl mx-auto px-4 py-8">
+          <div className="bg-card-light dark:bg-card-dark rounded-2xl p-8 border border-border-light dark:border-border-dark text-center transition-colors duration-300">
+            <p className="text-text-light dark:text-text-dark">加载中...</p>
+          </div>
+        </div>
+      </BackgroundLayout>
+    );
+  }
 
   if (!post) {
     return (
@@ -32,6 +58,10 @@ export default function Post() {
       </BackgroundLayout>
     );
   }
+
+  const dateStr = post.publishedAt
+    ? new Date(post.publishedAt).toLocaleDateString('zh-CN')
+    : '';
 
   return (
     <BackgroundLayout imageUrls={homeImages}>
@@ -58,15 +88,15 @@ export default function Post() {
             </h1>
             <div className="flex items-center gap-4 flex-wrap">
               <time className="text-sm text-text-light dark:text-text-dark">
-                {post.date}
+                {dateStr}
               </time>
               <div className="flex flex-wrap gap-2">
-                {post.tags.map(tag => (
+                {post.tags.map(({ tag }) => (
                   <span
-                    key={tag}
+                    key={tag.id}
                     className="px-2.5 py-0.5 text-xs rounded-full bg-accent-light/10 dark:bg-accent-dark/10 text-accent-light dark:text-accent-dark border border-accent-light/20 dark:border-accent-dark/20 transition-colors duration-300"
                   >
-                    {tag}
+                    {tag.name}
                   </span>
                 ))}
               </div>
@@ -79,6 +109,9 @@ export default function Post() {
               {post.content}
             </Markdown>
           </div>
+
+          {/* Comments */}
+          <CommentSection postId={post.id} />
         </motion.article>
       </div>
     </BackgroundLayout>
