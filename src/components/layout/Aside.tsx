@@ -45,7 +45,7 @@ function ProfileCard({ tags, selectedTag, onTagSelect }: ProfileCardProps) {
       {/* Avatar */}
       <div className="flex justify-center mb-4">
         <motion.img
-          src="/img/Ole.webp"
+          src="/image/OLP.webp"
           alt="Lilly"
           className="w-20 h-20 rounded-full object-cover border-2 border-accent-light/30 dark:border-accent-dark/30"
           animate={{ opacity: [0.7, 1, 0.7] }}
@@ -94,7 +94,7 @@ function MobileProfileCard({ tags, selectedTag, onTagSelect }: ProfileCardProps)
       <div className="flex items-center gap-4">
         {/* Avatar */}
         <motion.img
-          src="/img/Ole.webp"
+          src="/image/OLP.webp"
           alt="Lilly"
           className="w-12 h-12 rounded-full object-cover shrink-0 border border-accent-light/30 dark:border-accent-dark/30"
           animate={{ opacity: [0.7, 1, 0.7] }}
