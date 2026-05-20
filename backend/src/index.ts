@@ -54,6 +54,13 @@ app.use('/api/tags', tagRoutes);
 app.use('/api/comments', commentRoutes);
 app.use('/api/images', imageRoutes);
 
+// Serve frontend SPA in production
+const frontendDist = path.resolve(process.cwd(), '../dist');
+app.use(express.static(frontendDist));
+app.get(/^(?!\/api).*/, (_req, res) => {
+  res.sendFile(path.join(frontendDist, 'index.html'));
+});
+
 // Error handler (must be last)
 app.use(errorHandler);
 

@@ -31,13 +31,15 @@ function getEnv(): Env {
     }
   }
 
+  const frontendUrl = process.env.FRONTEND_URL!;
+
   return {
     DATABASE_URL: process.env.DATABASE_URL!,
     JWT_SECRET: process.env.JWT_SECRET!,
     GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID!,
     GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET!,
-    GITHUB_CALLBACK_URL: process.env.GITHUB_CALLBACK_URL!,
-    FRONTEND_URL: process.env.FRONTEND_URL!,
+    GITHUB_CALLBACK_URL: process.env.GITHUB_CALLBACK_URL || `${frontendUrl}/api/auth/github/callback`,
+    FRONTEND_URL: frontendUrl,
     ADMIN_GITHUB_IDS: process.env.ADMIN_GITHUB_IDS!.split(',').map(id => id.trim()),
     PORT: parseInt(process.env.PORT || '3000', 10),
     NODE_ENV: process.env.NODE_ENV || 'development',
