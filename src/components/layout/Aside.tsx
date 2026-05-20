@@ -44,21 +44,18 @@ function ProfileCard({ tags, selectedTag, onTagSelect }: ProfileCardProps) {
     <div className="bg-card-light dark:bg-card-dark rounded-2xl p-6 border border-border-light dark:border-border-dark transition-colors duration-300">
       {/* Avatar */}
       <div className="flex justify-center mb-4">
-        <motion.div
-          className="w-20 h-20 rounded-full bg-accent-light/20 dark:bg-accent-dark/20 flex items-center justify-center"
+        <motion.img
+          src="/img/Ole.webp"
+          alt="Lilly"
+          className="w-20 h-20 rounded-full object-cover border-2 border-accent-light/30 dark:border-accent-dark/30"
           animate={{ opacity: [0.7, 1, 0.7] }}
           transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-        >
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-accent-light dark:text-accent-dark">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-            <circle cx="12" cy="7" r="4" />
-          </svg>
-        </motion.div>
+        />
       </div>
 
       {/* Username */}
       <h2 className="text-center text-lg font-bold text-heading-light dark:text-heading-dark mb-2">
-        Yuuzi
+        Lilly
       </h2>
 
       {/* Signature */}
@@ -96,16 +93,13 @@ function MobileProfileCard({ tags, selectedTag, onTagSelect }: ProfileCardProps)
     <div className="bg-card-light dark:bg-card-dark rounded-2xl p-4 border border-border-light dark:border-border-dark transition-colors duration-300 mb-4">
       <div className="flex items-center gap-4">
         {/* Avatar */}
-        <motion.div
-          className="w-12 h-12 rounded-full bg-accent-light/20 dark:bg-accent-dark/20 flex items-center justify-center shrink-0"
+        <motion.img
+          src="/img/Ole.webp"
+          alt="Lilly"
+          className="w-12 h-12 rounded-full object-cover shrink-0 border border-accent-light/30 dark:border-accent-dark/30"
           animate={{ opacity: [0.7, 1, 0.7] }}
           transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-        >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-accent-light dark:text-accent-dark">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-            <circle cx="12" cy="7" r="4" />
-          </svg>
-        </motion.div>
+        />
 
         {/* Info */}
         <div className="min-w-0">
