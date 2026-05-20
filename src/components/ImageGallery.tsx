@@ -9,15 +9,14 @@ export default function ImageGallery() {
 
   if (loading) return <Spinner size="sm" text="加载图片中..." />;
 
-  const allImages = Object.values(images).flat();
-  if (allImages.length === 0) return null;
+  if (images.length === 0) return null;
 
   return (
     <div className="bg-card-light dark:bg-card-dark rounded-2xl p-6 border border-border-light dark:border-border-dark transition-colors duration-300">
       <h3 className="text-lg font-semibold text-heading-light dark:text-heading-dark mb-4">Gallery</h3>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-        {allImages.slice(0, 9).map((url) => (
+        {images.slice(0, 9).map((url) => (
           <motion.div
             key={url}
             className="aspect-square rounded-lg overflow-hidden cursor-pointer"
