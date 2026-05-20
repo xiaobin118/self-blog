@@ -25,21 +25,20 @@ export default function BackgroundLayout({ imageUrls, children }: BackgroundLayo
   }, [bgImage]);
 
   return (
-    <div className="relative min-h-screen overflow-hidden">
+    <div className="relative min-h-screen">
       {/* Fallback color */}
-      <div className="fixed inset-0 bg-bg-light dark:bg-bg-dark" />
+      <div className="absolute inset-0 bg-bg-light dark:bg-bg-dark" />
 
-      {/* Background image: <img> + object-fit:cover instead of CSS background-image
-          to prevent "cover resize jump" during async image decode */}
+      {/* Background image: scrolls with content so long images are fully visible */}
       <img
         src={bgImage}
         alt=""
         aria-hidden="true"
-        className={`fixed inset-0 h-full w-full object-cover transition-opacity duration-300 ${loaded ? 'opacity-100' : 'opacity-0'}`}
+        className={`absolute inset-0 w-full object-cover transition-opacity duration-300 ${loaded ? 'opacity-100' : 'opacity-0'}`}
       />
 
-      {/* Overlay */}
-      <div className="fixed inset-0 bg-white/50 dark:bg-black/70" />
+      {/* Fixed overlay for readability */}
+      <div className="fixed inset-0 bg-white/50 dark:bg-black/70 pointer-events-none" />
 
       {/* Content */}
       <div className="relative z-10">

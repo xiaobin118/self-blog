@@ -1,4 +1,5 @@
 import express from 'express';
+import path from 'path';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
@@ -8,6 +9,7 @@ import authRoutes from './routes/auth.js';
 import postRoutes from './routes/posts.js';
 import tagRoutes from './routes/tags.js';
 import commentRoutes from './routes/comments.js';
+import imageRoutes from './routes/images.js';
 import type { ApiResponse } from './types/api.js';
 
 const app = express();
@@ -33,11 +35,15 @@ app.get('/health', (_req, res) => {
   res.json(response);
 });
 
+// Static files (serve public/images)
+app.use('/image', express.static(path.resolve(process.cwd(), '../public/image')));
+
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/api/tags', tagRoutes);
 app.use('/api/comments', commentRoutes);
+app.use('/api/images', imageRoutes);
 
 // Error handler (must be last)
 app.use(errorHandler);

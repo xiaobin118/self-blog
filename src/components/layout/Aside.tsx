@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { tagsApi, type ApiTag } from '../../api/client';
+import ImageGallery from '../ImageGallery';
 
 interface AsideProps {
   selectedTag?: string;
@@ -19,8 +20,9 @@ export default function Aside({ selectedTag, onTagSelect }: AsideProps) {
   return (
     <aside className="w-full lg:w-[280px] lg:shrink-0">
       {/* Desktop: sticky sidebar */}
-      <div className="hidden lg:block sticky top-20">
+      <div className="hidden lg:block sticky top-20 space-y-4">
         <ProfileCard tags={tags} selectedTag={selectedTag} onTagSelect={onTagSelect} />
+        <ImageGallery />
       </div>
 
       {/* Mobile: horizontal scrolling card */}
