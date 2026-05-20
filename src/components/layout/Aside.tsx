@@ -60,7 +60,7 @@ function ProfileCard({ tags, selectedTag, onTagSelect }: ProfileCardProps) {
 
       {/* Signature */}
       <p className="text-center text-sm text-text-light dark:text-text-dark mb-6 leading-relaxed">
-        Gott ist tot. Hi there, I'm a programmer who loves anime.
+        Hi there, I'm a programmer form HIT. I love music and anime, hope you can find something interesting here!
       </p>
 
       {/* Tags */}
