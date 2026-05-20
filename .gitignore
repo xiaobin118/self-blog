@@ -34,3 +34,13 @@ Thumbs.db
 *.njsproj
 *.sln
 *.sw?
+
+# Claude Code
+.claude/
+
+# Backend
+backend/node_modules
+backend/dist
+backend/.env
+backend/prisma/*.db
+backend/prisma/*.db-journal
