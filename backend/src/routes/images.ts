@@ -13,7 +13,8 @@ router.get('/', async (_req, res) => {
     const files = await fs.readdir(IMAGE_DIR);
     const images = files
       .filter(f => IMAGE_EXTENSIONS.has(path.extname(f).toLowerCase()))
-      .map(f => `/image/gallery/${encodeURIComponent(f)}`);
+      .slice(0, 9)
+      .map(f => encodeURI(`/image/gallery/${f}`));
 
     const response: ApiResponse<string[]> = { success: true, data: images };
     res.json(response);

@@ -15,7 +15,16 @@ import type { ApiResponse } from './types/api.js';
 const app = express();
 
 // Global middleware
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      imgSrc: ["'self'", "data:", "blob:", "*"],
+      scriptSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+    },
+  },
+}));
 app.use(cors({
   origin: env.FRONTEND_URL,
   credentials: true,
