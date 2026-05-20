@@ -123,6 +123,10 @@ export const postsApi = {
 
 export const tagsApi = {
   getAll: () => api.get<never, ApiResponse<ApiTag[]>>('/api/tags'),
+  create: (name: string) =>
+    api.post<never, ApiResponse<ApiTag>>('/api/tags', { name }),
+  delete: (id: string) =>
+    api.delete<never, ApiResponse>(`/api/tags/${id}`),
 };
 
 // --- Comments API ---
