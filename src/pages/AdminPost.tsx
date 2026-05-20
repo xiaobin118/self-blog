@@ -4,21 +4,21 @@ import { postsApi, tagsApi, type ApiTag } from '../api/client';
 import { useAuth } from '../hooks/useAuth';
 
 export default function AdminPost() {
-  const { id } = useParams<{ id: string }>();
+  const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const { isAdmin } = useAuth();
-  const isEditing = Boolean(id);
+  const isEditing = Boolean(slug);
 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [summary, setSummary] = useState('');
-  const [coverImage, setCoverImage] = useState('');
   const [published, setPublished] = useState(false);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [availableTags, setAvailableTags] = useState<ApiTag[]>([]);
   const [newTag, setNewTag] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [postId, setPostId] = useState('');
 
   useEffect(() => {
     if (!isAdmin) {
@@ -30,20 +30,20 @@ export default function AdminPost() {
       if (res.success) setAvailableTags(res.data!);
     });
 
-    if (id) {
-      postsApi.getBySlug(id).then(res => {
-        if (res.success) {
-          const post = res.data!;
+    if (slug) {
+      postsApi.getBySlug(slug).then(res => {
+        if (res.success && res.data) {
+          const post = res.data;
+          setPostId(post.id);
           setTitle(post.title);
           setContent(post.content);
           setSummary(post.summary);
-          setCoverImage(post.coverImage || '');
           setPublished(post.published);
           setSelectedTags(post.tags.map(t => t.tag.name));
         }
       });
     }
-  }, [id, isAdmin, navigate]);
+  }, [slug, isAdmin, navigate]);
 
   const handleAddTag = () => {
     const tag = newTag.trim();
@@ -57,6 +57,14 @@ export default function AdminPost() {
     setSelectedTags(selectedTags.filter(t => t !== tag));
   };
 
+  const handleToggleTag = (tagName: string) => {
+    if (selectedTags.includes(tagName)) {
+      setSelectedTags(selectedTags.filter(t => t !== tagName));
+    } else {
+      setSelectedTags([...selectedTags, tagName]);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -67,14 +75,13 @@ export default function AdminPost() {
         title,
         content,
         summary,
-        coverImage: coverImage || undefined,
         published,
         tags: selectedTags,
       };
 
       let res;
-      if (isEditing && id) {
-        res = await postsApi.update(id, data);
+      if (isEditing && postId) {
+        res = await postsApi.update(postId, data);
       } else {
         res = await postsApi.create(data);
       }
@@ -93,99 +100,102 @@ export default function AdminPost() {
 
   return (
     <div className="max-w-3xl mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-6">
+      <h1 className="text-2xl font-bold mb-6 text-heading-light dark:text-heading-dark">
         {isEditing ? 'Edit Post' : 'New Post'}
       </h1>
 
       {error && (
-        <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg text-sm">{error}</div>
+        <div className="mb-4 p-3 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-lg text-sm">{error}</div>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium mb-1">Title</label>
+          <label className="block text-sm font-medium mb-1 text-heading-light dark:text-heading-dark">Title</label>
           <input
             type="text"
             value={title}
             onChange={e => setTitle(e.target.value)}
-            className="w-full p-2 border rounded-lg dark:bg-gray-800 dark:border-gray-600"
+            className="w-full p-2 border rounded-lg bg-bg-light dark:bg-bg-dark border-border-light dark:border-border-dark text-heading-light dark:text-heading-dark"
             required
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">Summary</label>
+          <label className="block text-sm font-medium mb-1 text-heading-light dark:text-heading-dark">Summary</label>
           <input
             type="text"
             value={summary}
             onChange={e => setSummary(e.target.value)}
-            className="w-full p-2 border rounded-lg dark:bg-gray-800 dark:border-gray-600"
+            className="w-full p-2 border rounded-lg bg-bg-light dark:bg-bg-dark border-border-light dark:border-border-dark text-heading-light dark:text-heading-dark"
             required
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">Cover Image URL</label>
-          <input
-            type="text"
-            value={coverImage}
-            onChange={e => setCoverImage(e.target.value)}
-            className="w-full p-2 border rounded-lg dark:bg-gray-800 dark:border-gray-600"
-            placeholder="https://..."
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium mb-1">Content (Markdown)</label>
+          <label className="block text-sm font-medium mb-1 text-heading-light dark:text-heading-dark">Content (Markdown)</label>
           <textarea
             value={content}
             onChange={e => setContent(e.target.value)}
-            className="w-full p-2 border rounded-lg dark:bg-gray-800 dark:border-gray-600 font-mono text-sm"
+            className="w-full p-2 border rounded-lg bg-bg-light dark:bg-bg-dark border-border-light dark:border-border-dark text-heading-light dark:text-heading-dark font-mono text-sm"
             rows={15}
             required
           />
         </div>
 
+        {/* Tags */}
         <div>
-          <label className="block text-sm font-medium mb-1">Tags</label>
+          <label className="block text-sm font-medium mb-1 text-heading-light dark:text-heading-dark">Tags</label>
+
+          {/* Selected tags */}
           <div className="flex flex-wrap gap-2 mb-2">
             {selectedTags.map(tag => (
               <span
                 key={tag}
-                className="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-sm rounded-full flex items-center gap-1"
+                className="px-2.5 py-1 bg-accent-light/10 dark:bg-accent-dark/10 text-accent-light dark:text-accent-dark text-sm rounded-full flex items-center gap-1 border border-accent-light/20 dark:border-accent-dark/20"
               >
                 {tag}
-                <button type="button" onClick={() => handleRemoveTag(tag)} className="text-red-500">&times;</button>
+                <button type="button" onClick={() => handleRemoveTag(tag)} className="text-red-400 hover:text-red-600 cursor-pointer">&times;</button>
               </span>
             ))}
           </div>
+
+          {/* Available tags (clickable) */}
+          {availableTags.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 mb-2">
+              {availableTags.map(tag => {
+                const isSelected = selectedTags.includes(tag.name);
+                return (
+                  <button
+                    key={tag.id}
+                    type="button"
+                    onClick={() => handleToggleTag(tag.name)}
+                    className={`px-2.5 py-0.5 text-xs rounded-full border cursor-pointer transition-colors ${
+                      isSelected
+                        ? 'bg-accent-light dark:bg-accent-dark text-white border-accent-light dark:border-accent-dark'
+                        : 'bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark border-border-light dark:border-border-dark hover:border-accent-light/50 dark:hover:border-accent-dark/50'
+                    }`}
+                  >
+                    {isSelected ? '✓ ' : '+ '}{tag.name}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Add custom tag */}
           <div className="flex gap-2">
             <input
               type="text"
               value={newTag}
               onChange={e => setNewTag(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), handleAddTag())}
-              className="flex-1 p-2 border rounded-lg dark:bg-gray-800 dark:border-gray-600 text-sm"
-              placeholder="Add a tag..."
+              className="flex-1 p-2 border rounded-lg bg-bg-light dark:bg-bg-dark border-border-light dark:border-border-dark text-heading-light dark:text-heading-dark text-sm"
+              placeholder="自定义标签..."
             />
-            <button type="button" onClick={handleAddTag} className="px-3 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg text-sm">
+            <button type="button" onClick={handleAddTag} className="px-3 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg text-sm text-heading-light dark:text-heading-dark cursor-pointer">
               Add
             </button>
           </div>
-          {availableTags.length > 0 && (
-            <div className="mt-2 flex flex-wrap gap-1">
-              {availableTags.filter(t => !selectedTags.includes(t.name)).map(tag => (
-                <button
-                  key={tag.id}
-                  type="button"
-                  onClick={() => setSelectedTags([...selectedTags, tag.name])}
-                  className="px-2 py-0.5 text-xs bg-gray-100 dark:bg-gray-800 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"
-                >
-                  + {tag.name}
-                </button>
-              ))}
-            </div>
-          )}
         </div>
 
         <div className="flex items-center gap-2">
@@ -195,21 +205,21 @@ export default function AdminPost() {
             checked={published}
             onChange={e => setPublished(e.target.checked)}
           />
-          <label htmlFor="published" className="text-sm">Publish immediately</label>
+          <label htmlFor="published" className="text-sm text-heading-light dark:text-heading-dark">Publish immediately</label>
         </div>
 
         <div className="flex gap-3">
           <button
             type="submit"
             disabled={loading}
-            className="px-6 py-2 bg-blue-500 text-white rounded-lg disabled:opacity-50"
+            className="px-6 py-2 bg-accent-light dark:bg-accent-dark text-white rounded-lg disabled:opacity-50 cursor-pointer"
           >
             {loading ? 'Saving...' : isEditing ? 'Update' : 'Create'}
           </button>
           <button
             type="button"
             onClick={() => navigate(-1)}
-            className="px-6 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg"
+            className="px-6 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg text-heading-light dark:text-heading-dark cursor-pointer"
           >
             Cancel
           </button>
