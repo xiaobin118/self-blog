@@ -19,10 +19,10 @@ const sections: LifeSection[] = [
     title: 'Music',
     icon: '♫',
     items: [
-      { title: 'Yurisa - Moonlight Sonata', detail: 'Classical crossover with modern arrangement' },
-      { title: 'RADWIMPS - Sparkle', detail: 'Your Name OST, always hits different' },
-      { title: 'Nujabes - Feather', detail: 'The godfather of lo-fi hip hop' },
-      { title: 'Joe Hisaishi - Summer', detail: 'Simple yet profoundly beautiful piano piece' },
+      { title: 'Diverse System', detail: '极爱Diverse System，新出的AD PIANOX 高兴了一整天，喜欢日式同人音乐，喜欢听钢琴曲，偶尔听听一些Hardcore' },
+      { title: '"Immutable" by Juggernaut', detail: '一首future bass，"生存的证明是沉眠"，万物沉寂沉睡，熬过离别和遗憾。就像寒冬过后冰雪融化，春天悄悄从废墟里冒出来，安静蛰伏只为积蓄力量，整首歌温柔又治愈，满是静待新生的希望' },
+      { title: '"ピアノ三重奏" by Sakuzyo', detail: '在高考上考场前，听这首曲字抚平焦虑，在钢琴和弦乐的交织中顺利答完题目。自由不羁，但又总能找到秩序的美感' },
+      { title: '"輪廻" by ARForest', detail: '温柔又宏厚的弦乐，在诉说着生命的轮回和不息的希望，仿佛能听到森林万物的呼吸，歌唱，声声不息' },
     ],
   },
   {
@@ -30,9 +30,9 @@ const sections: LifeSection[] = [
     title: 'Art',
     icon: '🎨',
     items: [
-      { title: 'Claude Monet', detail: 'Impressionist master, love his water lilies series' },
-      { title: 'Zdzisław Beksiński', detail: 'Dark surrealism, hauntingly beautiful' },
-      { title: 'Makoto Shinkai', detail: 'The sky is his canvas, every frame is art' },
+      { title: '二次元文化', detail: '看看漫画，追追番。极乐幻奇谭，血族Bloodline，一拳超人... 各种类型的漫画都有所涉猎' },
+      { title: 'Claude Monet', detail: '极爱印象派，色彩和光影的运用让人沉醉！快看，他的画好像在呼吸！' },
+      { title: '电影', detail: '不怎么看电影（也许是时间太长了...）' },
     ],
   },
   {
@@ -40,10 +40,9 @@ const sections: LifeSection[] = [
     title: 'Game',
     icon: '🎮',
     items: [
-      { title: 'NieR: Automata', detail: 'A philosophical masterpiece disguised as an action game' },
-      { title: 'Hollow Knight', detail: 'Beautiful hand-drawn metroidvania with deep lore' },
-      { title: 'Elden Ring', detail: 'Open world souls-like, exploration at its finest' },
-      { title: 'Celeste', detail: 'Tight platformer with an emotional story' },
+      { title: "Girls' Frontline", detail: '从初中开始玩的陈年老游，剧情和设定夯爆了！美术也好看！It is a true masterpiece in waifu game!' },
+      { title: '坎公骑冠剑', detail: '剧情也夯，也是希望他能一直更下去吧' },
+      { title: '音游', detail: '虽然现在玩的少了，CytusII，Deemo 音乐都很好听，雷亚你干得好啊！' },
     ],
   },
 ];

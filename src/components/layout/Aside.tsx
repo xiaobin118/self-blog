@@ -110,10 +110,10 @@ function MobileProfileCard({ tags, selectedTag, onTagSelect }: ProfileCardProps)
         {/* Info */}
         <div className="min-w-0">
           <h2 className="text-base font-bold text-heading-light dark:text-heading-dark">
-            Yuuzi
+                Lilly
           </h2>
           <p className="text-xs text-text-light dark:text-text-dark truncate">
-            Gott ist tot. Hi there, I'm a programmer who loves anime.
+                Hi there, I'm a programmer form HIT. I love music and anime, hope you can find something interesting here!
           </p>
         </div>
       </div>
