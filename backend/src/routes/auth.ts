@@ -12,7 +12,14 @@ import type { JwtPayload } from '../types/jwt.js';
 const router = Router();
 
 // GET /api/auth/github – Redirect to GitHub OAuth
-router.get('/github', authLimiter, passport.authenticate('github', { scope: ['user:email'], session: false }));
+router.get('/github', authLimiter, (req, res, next) => {
+  // Capture frontend origin for post-OAuth redirect
+  const origin = (req.query.origin as string) || (req.headers.referer ? new URL(req.headers.referer).origin : '');
+  if (origin && req.session) {
+    (req.session as unknown as Record<string, unknown>).frontendOrigin = origin;
+  }
+  passport.authenticate('github', { scope: ['user:email'], session: false })(req, res, next);
+});
 
 // GET /api/auth/github/callback – Handle OAuth callback
 router.get(
@@ -21,7 +28,8 @@ router.get(
   (req, res) => {
     const { userId, role } = req.user as JwtPayload;
     const token = jwt.sign({ userId, role }, env.JWT_SECRET, { expiresIn: '7d' });
-    res.redirect(`${env.FRONTEND_URL}/auth/callback?token=${token}`);
+    const origin = (req.session as unknown as Record<string, unknown>)?.frontendOrigin as string || env.FRONTEND_URL;
+    res.redirect(`${origin}/auth/callback?token=${token}`);
   },
 );
 

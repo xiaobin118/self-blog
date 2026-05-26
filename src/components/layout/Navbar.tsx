@@ -151,7 +151,7 @@ function UserMenu() {
 
   return (
     <a
-      href={`${API_BASE_URL}/api/auth/github`}
+      href={`${API_BASE_URL}/api/auth/github?origin=${encodeURIComponent(window.location.origin)}`}
       className="text-sm text-text-light dark:text-text-dark hover:text-heading-light dark:hover:text-heading-dark transition-colors"
     >
       Login

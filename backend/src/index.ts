@@ -4,6 +4,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import compression from 'compression';
+import session from 'express-session';
 import { env } from './config/env.js';
 import { prisma } from './lib/prisma.js';
 import { errorHandler } from './middleware/errorHandler.js';
@@ -41,11 +42,18 @@ app.use(helmet({
   },
 }));
 app.use(cors({
-  origin: [env.FRONTEND_URL, `http://localhost:${env.PORT}`].filter(Boolean),
+  origin: env.NODE_ENV === 'development'
+    ? (_origin, callback) => callback(null, true)
+    : [env.FRONTEND_URL, `http://localhost:${env.PORT}`].filter(Boolean),
   credentials: true,
 }));
 app.use(morgan('dev'));
 app.use(express.json());
+app.use(session({
+  secret: env.JWT_SECRET,
+  resave: false,
+  saveUninitialized: false,
+}));
 
 // General rate limiter on all /api routes
 app.use('/api', generalLimiter);
