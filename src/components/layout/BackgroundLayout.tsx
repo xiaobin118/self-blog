@@ -16,11 +16,13 @@ export default function BackgroundLayout({ imageUrls, children }: BackgroundLayo
 
   useEffect(() => {
     const img = new Image();
+    img.decoding = 'async';
     img.src = bgImage;
     if (img.complete) {
       setLoaded(true);
     } else {
       img.onload = () => setLoaded(true);
+      img.onerror = () => setLoaded(true); // show content even if image fails
     }
   }, [bgImage]);
 
@@ -34,13 +36,14 @@ export default function BackgroundLayout({ imageUrls, children }: BackgroundLayo
         src={bgImage}
         alt=""
         aria-hidden="true"
-        className={`absolute inset-0 w-full object-cover transition-opacity duration-300 ${loaded ? 'opacity-100' : 'opacity-0'}`}
+        decoding="async"
+        className={`absolute inset-0 w-full object-cover transition-opacity duration-500 ${loaded ? 'opacity-100' : 'opacity-0'}`}
       />
 
       {/* Fixed overlay for readability */}
       <div className="fixed inset-0 bg-white/50 dark:bg-black/70 pointer-events-none" />
 
-      {/* Content */}
+      {/* Content — show immediately, don't wait for image */}
       <div className="relative z-10">
         {children}
       </div>

@@ -4,9 +4,8 @@ import TimeLine from '../components/TimeLine';
 import { useSEO } from '../hooks/useSEO';
 
 const archiveImages = [
-  '/image/achieve/the-neon-lit-streets-of-a-cyberpunk-anime-night-city-with-this-captivating-4k-wallpaper-generated-ai-free-photo.jpg',
-  '/image/achieve/lucy-cyberpunk-edgerunners-anime-wallpaper-3554x1999_53.jpg',
-  '/image/achieve/wp11532730.jpg',
+    '/image/achieve/1.webp',
+    '/image/achieve/13.webp',
 ];
 
 export default function Archive() {

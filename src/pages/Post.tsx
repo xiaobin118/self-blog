@@ -12,8 +12,8 @@ import CommentSection from '../components/CommentSection';
 import Spinner from '../components/ui/Spinner';
 
 const homeImages = [
-  '/image/home/woman_with_a_parasol_-_madame_monet_and_her_son_1983.1.29.jpg',
-  '/image/home/普维尔悬崖漫步.jpg',
+  '/image/home/woman_with_a_parasol_-_madame_monet_and_her_son_1983.1.29.webp',
+  '/image/home/普维尔悬崖漫步.webp',
   '/image/home/153-莫奈- Bend in the Epte River near Giverny.webp',
   '/image/home/400-莫奈-Woman Seated under the Willows.webp',
 ];
