@@ -18,5 +18,11 @@ export default defineConfig([
     languageOptions: {
       globals: globals.browser,
     },
+    rules: {
+      // setState in useEffect is a legitimate pattern for data fetching
+      'react-hooks/set-state-in-effect': 'warn',
+      // Allow context files to export both provider and hook
+      'react-refresh/only-export-components': 'off',
+    },
   },
 ])

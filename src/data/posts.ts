@@ -132,13 +132,13 @@ Digital Signal Processing (DSP) is the manipulation of signals after they have b
 
 The **Nyquist theorem** states that to accurately represent a signal, you must sample at least **twice** the highest frequency component:
 
-$$f_s \geq 2 \cdot f_{max}$$
+$$f_s \\geq 2 \\cdot f_{max}$$
 
 ### The Z-Transform
 
 The Z-transform is the discrete equivalent of the Laplace transform:
 
-$$X(z) = \sum_{n=-\infty}^{\infty} x[n] z^{-n}$$
+$$X(z) = \\sum_{n=-\\infty}^{\\infty} x[n] z^{-n}$$
 
 ## Implementing a Simple Filter
 
