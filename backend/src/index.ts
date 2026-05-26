@@ -18,8 +18,15 @@ import type { ApiResponse } from './types/api.js';
 
 const app = express();
 
-// Compression (must be first)
-app.use(compression());
+// Compression — skip already-compressed formats (images, fonts)
+app.use(compression({
+  filter: (req, res) => {
+    if (req.path.match(/\.(jpg|jpeg|png|gif|webp|svg|ico|woff2?|ttf|eot)$/i)) {
+      return false;
+    }
+    return compression.filter(req, res);
+  },
+}));
 
 // Global middleware
 app.use(helmet({

@@ -3,7 +3,6 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import DOMPurify from 'dompurify';
 import { Helmet } from 'react-helmet-async';
 import { postsApi, type ApiPost } from '../api/client';
 import { useAuth } from '../context/AuthContext';
@@ -169,7 +168,7 @@ export default function Post() {
           {/* Content */}
           <div className="prose prose-lg max-w-none dark:prose-invert prose-headings:text-heading-light dark:prose-headings:text-heading-dark prose-p:text-text-light dark:prose-p:text-text-dark prose-a:text-accent-light dark:prose-a:text-accent-dark prose-code:bg-bg-light dark:prose-code:bg-bg-dark prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-pre:bg-bg-light dark:prose-pre:bg-bg-dark prose-pre:border prose-pre:border-border-light dark:prose-pre:border-border-dark prose-blockquote:border-accent-light dark:prose-blockquote:border-accent-dark prose-strong:text-heading-light dark:prose-strong:text-heading-dark">
             <Markdown remarkPlugins={[remarkGfm]}>
-              {DOMPurify.sanitize(post.content)}
+              {post.content}
             </Markdown>
           </div>
 
