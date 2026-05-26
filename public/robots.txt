@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://lillys-blog.onrender.com/sitemap.xml

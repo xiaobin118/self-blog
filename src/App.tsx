@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
+import { HelmetProvider } from 'react-helmet-async';
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
 import { useScrollVisibility } from './hooks/useScrollVisibility';
@@ -106,15 +107,17 @@ export default function App() {
   useScrollVisibility();
 
   return (
-    <ThemeProvider>
-      <AuthProvider>
-        <BrowserRouter>
-          <Navbar />
-          <main className="pt-16">
-            <AnimatedRoutes />
-          </main>
-        </BrowserRouter>
-      </AuthProvider>
-    </ThemeProvider>
+    <HelmetProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <BrowserRouter>
+            <Navbar />
+            <main className="pt-16">
+              <AnimatedRoutes />
+            </main>
+          </BrowserRouter>
+        </AuthProvider>
+      </ThemeProvider>
+    </HelmetProvider>
   );
 }

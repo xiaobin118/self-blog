@@ -12,6 +12,7 @@ import postRoutes from './routes/posts.js';
 import tagRoutes from './routes/tags.js';
 import commentRoutes from './routes/comments.js';
 import imageRoutes from './routes/images.js';
+import sitemapRoutes from './routes/sitemap.js';
 import type { ApiResponse } from './types/api.js';
 
 const app = express();
@@ -67,6 +68,7 @@ app.use('/api/posts', postRoutes);
 app.use('/api/tags', tagRoutes);
 app.use('/api/comments', commentRoutes);
 app.use('/api/images', imageRoutes);
+app.use('/sitemap.xml', sitemapRoutes);
 
 // Serve frontend SPA in production
 const frontendDist = path.resolve(process.cwd(), '../dist');

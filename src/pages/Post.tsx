@@ -4,8 +4,10 @@ import { motion } from 'framer-motion';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import DOMPurify from 'dompurify';
+import { Helmet } from 'react-helmet-async';
 import { postsApi, type ApiPost } from '../api/client';
 import { useAuth } from '../context/AuthContext';
+import { useSEO } from '../hooks/useSEO';
 import BackgroundLayout from '../components/layout/BackgroundLayout';
 import CommentSection from '../components/CommentSection';
 import Spinner from '../components/ui/Spinner';
@@ -76,8 +78,23 @@ export default function Post() {
     ? new Date(post.publishedAt).toLocaleDateString('zh-CN')
     : '';
 
+  const seo = useSEO({ title: post.title, description: post.summary, type: 'article' });
+
   return (
     <BackgroundLayout imageUrls={homeImages}>
+      <Helmet>
+        <title>{seo.title}</title>
+        <meta name="description" content={seo.description} />
+        <meta property="og:title" content={post.title} />
+        <meta property="og:description" content={seo.description} />
+        <meta property="og:type" content="article" />
+        <meta property="og:url" content={seo.url} />
+        <meta property="article:published_time" content={post.publishedAt || post.createdAt} />
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:title" content={post.title} />
+        <meta name="twitter:description" content={seo.description} />
+        <link rel="canonical" href={seo.url} />
+      </Helmet>
       <div className="max-w-4xl mx-auto px-4 py-8">
         <motion.article
           initial={{ opacity: 0, y: 20 }}
