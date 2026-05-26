@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { commentsApi, type ApiComment } from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
@@ -72,19 +72,19 @@ export default function CommentSection({ postId }: CommentSectionProps) {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
-  const fetchComments = async () => {
+  const fetchComments = useCallback(async () => {
     try {
       const res = await commentsApi.getByPost(postId);
       if (res.success) setComments(res.data!);
     } catch {
       showToast('加载评论失败', 'error');
     }
-  };
+  }, [postId, showToast]);
 
   useEffect(() => {
     setLoading(true);
     fetchComments().finally(() => setLoading(false));
-  }, [postId]);
+  }, [fetchComments]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

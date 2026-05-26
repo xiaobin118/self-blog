@@ -44,8 +44,12 @@ app.use(express.json());
 app.use('/api', generalLimiter);
 
 // Block direct access to database files
-app.use('*.db', (_req, res) => {
-  res.status(403).json({ success: false, error: 'Forbidden' });
+app.use((req, res, next) => {
+  if (req.path.endsWith('.db')) {
+    res.status(403).json({ success: false, error: 'Forbidden' });
+    return;
+  }
+  next();
 });
 
 // Health check

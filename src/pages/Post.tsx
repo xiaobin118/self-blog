@@ -26,6 +26,12 @@ export default function Post() {
   const { isAdmin } = useAuth();
   const navigate = useNavigate();
 
+  const seo = useSEO({
+    title: post?.title,
+    description: post?.summary,
+    type: 'article',
+  });
+
   useEffect(() => {
     if (!slug) return;
     setLoading(true);
@@ -77,8 +83,6 @@ export default function Post() {
   const dateStr = post.publishedAt
     ? new Date(post.publishedAt).toLocaleDateString('zh-CN')
     : '';
-
-  const seo = useSEO({ title: post.title, description: post.summary, type: 'article' });
 
   return (
     <BackgroundLayout imageUrls={homeImages}>
