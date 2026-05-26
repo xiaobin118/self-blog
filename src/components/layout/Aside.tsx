@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { tagsApi, type ApiTag } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
-import ImageGallery from '../ImageGallery';
+import Connect from '../Connect';
 
 interface AsideProps {
   selectedTag?: string;
@@ -47,7 +47,7 @@ export default function Aside({ selectedTag, onTagSelect }: AsideProps) {
           onAddTag={handleAddTag}
           onDeleteTag={handleDeleteTag}
         />
-        <ImageGallery />
+        <Connect />
       </div>
 
       {/* Mobile: horizontal scrolling card */}
