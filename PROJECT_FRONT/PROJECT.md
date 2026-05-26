@@ -60,7 +60,7 @@
 ### 2.2 Aside.tsx
 **内容：**
 - 用户头像（可用占位符图片或 Material Icon）
-- 用户名：Yuuzi
+- 用户名：Lilly
 - 个性签名：「Gott ist tot. Hi there, I'm a programmer who loves anime.」
 - 标签列表：Arch Linux, CLI Tools, Conda, Customization, Dark Mode, DSP, Extension
 
