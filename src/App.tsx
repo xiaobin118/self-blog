@@ -4,9 +4,11 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { HelmetProvider } from 'react-helmet-async';
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
+import { ToastProvider } from './context/ToastContext';
 import { useScrollVisibility } from './hooks/useScrollVisibility';
 import Navbar from './components/layout/Navbar';
 import PageSkeleton from './components/PageSkeleton';
+import BackToTop from './components/BackToTop';
 import type { ReactNode } from 'react';
 
 const Home = lazy(() => import('./pages/Home'));
@@ -110,12 +112,15 @@ export default function App() {
     <HelmetProvider>
       <ThemeProvider>
         <AuthProvider>
-          <BrowserRouter>
-            <Navbar />
-            <main className="pt-16">
-              <AnimatedRoutes />
-            </main>
-          </BrowserRouter>
+          <ToastProvider>
+            <BrowserRouter>
+              <Navbar />
+              <main className="pt-16">
+                <AnimatedRoutes />
+              </main>
+              <BackToTop />
+            </BrowserRouter>
+          </ToastProvider>
         </AuthProvider>
       </ThemeProvider>
     </HelmetProvider>

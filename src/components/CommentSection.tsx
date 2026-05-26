@@ -1,15 +1,20 @@
 import { useState, useEffect } from 'react';
 import { commentsApi, type ApiComment } from '../api/client';
 import { useAuth } from '../context/AuthContext';
-import Spinner from './ui/Spinner';
+import { useToast } from '../context/ToastContext';
+import CommentSkeleton from './CommentSkeleton';
 
 interface CommentSectionProps {
   postId: string;
 }
 
+interface PendingComment extends ApiComment {
+  pending?: boolean;
+}
+
 interface CommentItemProps {
-  comment: ApiComment;
-  replies: ApiComment[];
+  comment: PendingComment;
+  replies: PendingComment[];
   onDelete: (id: string) => void;
   onReply: (parentId: string) => void;
   isAdmin: boolean;
@@ -21,19 +26,24 @@ function CommentItem({ comment, replies, onDelete, onReply, isAdmin, currentUser
   const date = new Date(comment.createdAt).toLocaleDateString('zh-CN');
 
   return (
-    <div className="border-l-2 border-border-light dark:border-border-dark pl-4 mb-4">
+    <div className={`border-l-2 border-border-light dark:border-border-dark pl-4 mb-4 ${comment.pending ? 'opacity-60' : ''}`}>
       <div className="flex items-center gap-2 mb-1">
         <img src={comment.user.avatarUrl} alt="" className="w-6 h-6 rounded-full" />
         <span className="font-medium text-sm text-heading-light dark:text-heading-dark">{comment.user.username}</span>
         <span className="text-xs text-text-light dark:text-text-dark">{date}</span>
-      </div>
-      <p className="text-sm text-text-light dark:text-text-dark mb-2">{comment.content}</p>
-      <div className="flex gap-3 text-xs text-text-light dark:text-text-dark">
-        <button onClick={() => onReply(comment.id)} className="hover:text-accent-light dark:hover:text-accent-dark cursor-pointer">Reply</button>
-        {canDelete && (
-          <button onClick={() => onDelete(comment.id)} className="hover:text-red-500 cursor-pointer">Delete</button>
+        {comment.pending && (
+          <span className="text-xs text-yellow-500">发送中...</span>
         )}
       </div>
+      <p className="text-sm text-text-light dark:text-text-dark mb-2">{comment.content}</p>
+      {!comment.pending && (
+        <div className="flex gap-3 text-xs text-text-light dark:text-text-dark">
+          <button onClick={() => onReply(comment.id)} className="hover:text-accent-light dark:hover:text-accent-dark cursor-pointer">Reply</button>
+          {canDelete && (
+            <button onClick={() => onDelete(comment.id)} className="hover:text-red-500 cursor-pointer">Delete</button>
+          )}
+        </div>
+      )}
       {replies.length > 0 && (
         <div className="mt-2">
           {replies.map(reply => (
@@ -55,7 +65,8 @@ function CommentItem({ comment, replies, onDelete, onReply, isAdmin, currentUser
 
 export default function CommentSection({ postId }: CommentSectionProps) {
   const { user, isAdmin } = useAuth();
-  const [comments, setComments] = useState<ApiComment[]>([]);
+  const { showToast } = useToast();
+  const [comments, setComments] = useState<PendingComment[]>([]);
   const [content, setContent] = useState('');
   const [replyTo, setReplyTo] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -65,7 +76,9 @@ export default function CommentSection({ postId }: CommentSectionProps) {
     try {
       const res = await commentsApi.getByPost(postId);
       if (res.success) setComments(res.data!);
-    } catch { /* ignore */ }
+    } catch {
+      showToast('加载评论失败', 'error');
+    }
   };
 
   useEffect(() => {
@@ -75,28 +88,59 @@ export default function CommentSection({ postId }: CommentSectionProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!content.trim()) return;
+    if (!content.trim() || !user) return;
 
+    const tempId = `temp-${Date.now()}`;
+    const optimistic: PendingComment = {
+      id: tempId,
+      content: content.trim(),
+      postId,
+      userId: user.id,
+      parentId: replyTo,
+      createdAt: new Date().toISOString(),
+      isApproved: true,
+      user: { id: user.id, username: user.username, avatarUrl: user.avatarUrl, role: user.role },
+      pending: true,
+    };
+
+    // Optimistic insert
+    setComments(prev => [...prev, optimistic]);
+    const trimmed = content.trim();
+    setContent('');
+    setReplyTo(null);
     setSubmitting(true);
+
     try {
-      await commentsApi.create({
+      const res = await commentsApi.create({
         postId,
-        content: content.trim(),
+        content: trimmed,
         parentId: replyTo ?? undefined,
       });
-      setContent('');
-      setReplyTo(null);
-      fetchComments();
-    } catch { /* ignore */ }
-    finally { setSubmitting(false); }
+      if (res.success) {
+        // Replace optimistic with real data
+        setComments(prev => prev.map(c => c.id === tempId ? { ...res.data!, pending: false } : c));
+        showToast('评论发表成功', 'success');
+      }
+    } catch {
+      // Rollback on failure
+      setComments(prev => prev.filter(c => c.id !== tempId));
+      setContent(trimmed);
+      setReplyTo(replyTo);
+      showToast('评论发表失败，请重试', 'error');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleDelete = async (id: string) => {
     if (!confirm('确定删除这条评论吗？')) return;
     try {
       await commentsApi.delete(id);
-      fetchComments();
-    } catch { /* ignore */ }
+      setComments(prev => prev.filter(c => c.id !== id));
+      showToast('评论已删除', 'success');
+    } catch {
+      showToast('删除失败', 'error');
+    }
   };
 
   // Build tree: top-level comments + their replies
@@ -112,7 +156,11 @@ export default function CommentSection({ postId }: CommentSectionProps) {
       {/* Comment list */}
       <div className="mb-6">
         {loading ? (
-          <Spinner size="sm" text="加载评论中..." />
+          <div className="space-y-4">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <CommentSkeleton key={i} />
+            ))}
+          </div>
         ) : comments.length > 0 ? (
           topLevel.map(comment => (
             <CommentItem
