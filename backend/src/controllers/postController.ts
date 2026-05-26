@@ -50,7 +50,6 @@ export async function getPosts(req: Request, res: Response) {
     success: true,
     data,
   };
-  res.set('Cache-Control', 'public, max-age=300');
   res.json(response);
 }
 

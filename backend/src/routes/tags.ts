@@ -26,7 +26,6 @@ router.get(
     }));
 
     const response: ApiResponse<typeof data> = { success: true, data };
-    res.set('Cache-Control', 'public, max-age=300');
     res.json(response);
   }),
 );
