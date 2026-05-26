@@ -3,6 +3,7 @@ import path from 'path';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
+import compression from 'compression';
 import { env } from './config/env.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { generalLimiter } from './middleware/rateLimiter.js';
@@ -14,6 +15,9 @@ import imageRoutes from './routes/images.js';
 import type { ApiResponse } from './types/api.js';
 
 const app = express();
+
+// Compression (must be first)
+app.use(compression());
 
 // Global middleware
 app.use(helmet({

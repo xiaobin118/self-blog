@@ -32,6 +32,7 @@ export async function getPosts(req: Request, res: Response) {
       include: {
         tags: { include: { tag: true } },
         author: { select: { id: true, username: true, avatarUrl: true } },
+        _count: { select: { comments: true } },
       },
     }),
     prisma.post.count({ where }),
@@ -49,6 +50,7 @@ export async function getPosts(req: Request, res: Response) {
     success: true,
     data,
   };
+  res.set('Cache-Control', 'public, max-age=300');
   res.json(response);
 }
 

@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@prisma/client": "^6.9.0",
+    "compression": "^1.8.1",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
@@ -27,6 +28,7 @@
     "xss": "^1.0.15"
   },
   "devDependencies": {
+    "@types/compression": "^1.8.1",
     "@types/cors": "^2.8.18",
     "@types/express": "^5.0.2",
     "@types/jsonwebtoken": "^9.0.9",
