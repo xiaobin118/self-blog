@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import passport from '../config/passport.js';
 import { env } from '../config/env.js';
 import { authenticateJWT } from '../middleware/auth.js';
+import { authLimiter } from '../middleware/rateLimiter.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { prisma } from '../lib/prisma.js';
 import type { ApiResponse } from '../types/api.js';
@@ -11,7 +12,7 @@ import type { JwtPayload } from '../types/jwt.js';
 const router = Router();
 
 // GET /api/auth/github – Redirect to GitHub OAuth
-router.get('/github', passport.authenticate('github', { scope: ['user:email'], session: false }));
+router.get('/github', authLimiter, passport.authenticate('github', { scope: ['user:email'], session: false }));
 
 // GET /api/auth/github/callback – Handle OAuth callback
 router.get(

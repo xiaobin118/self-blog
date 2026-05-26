@@ -5,6 +5,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import { env } from './config/env.js';
 import { errorHandler } from './middleware/errorHandler.js';
+import { generalLimiter } from './middleware/rateLimiter.js';
 import authRoutes from './routes/auth.js';
 import postRoutes from './routes/posts.js';
 import tagRoutes from './routes/tags.js';
@@ -19,18 +20,27 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      imgSrc: ["'self'", "data:", "blob:", "*"],
+      imgSrc: ["'self'", "data:", "https://avatars.githubusercontent.com"],
       scriptSrc: ["'self'"],
       styleSrc: ["'self'", "'unsafe-inline'"],
+      connectSrc: ["'self'"],
     },
   },
 }));
 app.use(cors({
-  origin: env.FRONTEND_URL,
+  origin: [env.FRONTEND_URL, `http://localhost:${env.PORT}`].filter(Boolean),
   credentials: true,
 }));
 app.use(morgan('dev'));
 app.use(express.json());
+
+// General rate limiter on all /api routes
+app.use('/api', generalLimiter);
+
+// Block direct access to database files
+app.use('*.db', (_req, res) => {
+  res.status(403).json({ success: false, error: 'Forbidden' });
+});
 
 // Health check
 app.get('/health', (_req, res) => {

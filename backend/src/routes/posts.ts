@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { body } from 'express-validator';
 import { authenticateJWT, requireAdmin } from '../middleware/auth.js';
 import { validate } from '../middleware/validate.js';
+import { sanitizeBody } from '../middleware/sanitize.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import {
   getPosts,
@@ -24,6 +25,7 @@ router.post(
   '/',
   authenticateJWT,
   requireAdmin,
+  sanitizeBody(['title', 'summary']),
   [
     body('title').trim().notEmpty().withMessage('Title is required'),
     body('content').trim().notEmpty().withMessage('Content is required'),
@@ -39,6 +41,7 @@ router.put(
   '/:id',
   authenticateJWT,
   requireAdmin,
+  sanitizeBody(['title', 'summary']),
   [
     body('title').optional().trim().notEmpty().withMessage('Title cannot be empty'),
     body('content').optional().trim().notEmpty().withMessage('Content cannot be empty'),

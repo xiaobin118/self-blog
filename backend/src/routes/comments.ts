@@ -2,6 +2,8 @@ import { Router } from 'express';
 import { body } from 'express-validator';
 import { authenticateJWT, requireAdmin } from '../middleware/auth.js';
 import { validate } from '../middleware/validate.js';
+import { sanitizeBody } from '../middleware/sanitize.js';
+import { commentLimiter } from '../middleware/rateLimiter.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import {
   getComments,
@@ -18,7 +20,9 @@ router.get('/', asyncHandler(getComments));
 // POST /api/comments – Requires login
 router.post(
   '/',
+  commentLimiter,
   authenticateJWT,
+  sanitizeBody(['content']),
   [
     body('postId').trim().notEmpty().withMessage('postId is required'),
     body('content').trim().notEmpty().withMessage('Content is required'),
