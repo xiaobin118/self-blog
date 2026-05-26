@@ -25,7 +25,8 @@
     "morgan": "^1.10.0",
     "passport": "^0.7.0",
     "passport-github2": "^0.1.12",
-    "xss": "^1.0.15"
+    "xss": "^1.0.15",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/compression": "^1.8.1",

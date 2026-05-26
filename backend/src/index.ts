@@ -5,6 +5,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import compression from 'compression';
 import { env } from './config/env.js';
+import { prisma } from './lib/prisma.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { generalLimiter } from './middleware/rateLimiter.js';
 import authRoutes from './routes/auth.js';
@@ -48,11 +49,21 @@ app.use('*.db', (_req, res) => {
 });
 
 // Health check
-app.get('/health', (_req, res) => {
-  const response: ApiResponse<{ status: string; timestamp: string }> = {
+const startTime = Date.now();
+app.get('/health', async (_req, res) => {
+  let dbStatus = 'connected';
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+  } catch {
+    dbStatus = 'disconnected';
+  }
+
+  const response: ApiResponse<{ status: string; db: string; uptime: number; timestamp: string }> = {
     success: true,
     data: {
-      status: 'ok',
+      status: dbStatus === 'connected' ? 'ok' : 'degraded',
+      db: dbStatus,
+      uptime: Math.round((Date.now() - startTime) / 1000),
       timestamp: new Date().toISOString(),
     },
   };

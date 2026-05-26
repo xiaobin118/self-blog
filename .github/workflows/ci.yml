@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      # Frontend
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Lint frontend
+        run: npm run lint
+
+      - name: Type check frontend
+        run: npx tsc -b
+
+      - name: Build frontend
+        run: npm run build
+
+      # Backend
+      - name: Install backend dependencies
+        run: cd backend && npm ci
+
+      - name: Build backend
+        run: cd backend && npm run build
+
+      # Deploy to Render (only on push to master)
+      - name: Trigger Render deploy
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        run: |
+          if [ -n "${{ secrets.RENDER_DEPLOY_HOOK }}" ]; then
+            curl -s -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
+          fi

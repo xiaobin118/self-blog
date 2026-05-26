@@ -1,49 +1,41 @@
 import dotenv from 'dotenv';
+import { z } from 'zod';
 
 dotenv.config();
 
-interface Env {
-  DATABASE_URL: string;
-  JWT_SECRET: string;
-  GITHUB_CLIENT_ID: string;
-  GITHUB_CLIENT_SECRET: string;
-  GITHUB_CALLBACK_URL: string;
-  FRONTEND_URL: string;
-  ADMIN_GITHUB_IDS: string[];
-  PORT: number;
-  NODE_ENV: string;
-}
+const envSchema = z.object({
+  DATABASE_URL: z.string().min(1, 'DATABASE_URL is required'),
+  JWT_SECRET: z.string().min(1, 'JWT_SECRET is required'),
+  GITHUB_CLIENT_ID: z.string().min(1, 'GITHUB_CLIENT_ID is required'),
+  GITHUB_CLIENT_SECRET: z.string().min(1, 'GITHUB_CLIENT_SECRET is required'),
+  FRONTEND_URL: z.string().url('FRONTEND_URL must be a valid URL'),
+  ADMIN_GITHUB_IDS: z.string().min(1, 'ADMIN_GITHUB_IDS is required'),
+  PORT: z.string().default('3000'),
+  NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
+  GITHUB_CALLBACK_URL: z.string().optional(),
+});
 
-function getEnv(): Env {
-  const required = [
-    'DATABASE_URL',
-    'JWT_SECRET',
-    'GITHUB_CLIENT_ID',
-    'GITHUB_CLIENT_SECRET',
-    'GITHUB_CALLBACK_URL',
-    'FRONTEND_URL',
-    'ADMIN_GITHUB_IDS',
-  ];
+const parsed = envSchema.safeParse(process.env);
 
-  for (const key of required) {
-    if (!process.env[key]) {
-      throw new Error(`Missing required environment variable: ${key}`);
-    }
+if (!parsed.success) {
+  console.error('❌ Invalid environment variables:');
+  for (const issue of parsed.error.issues) {
+    console.error(`  ${issue.path.join('.')}: ${issue.message}`);
   }
-
-  const frontendUrl = process.env.FRONTEND_URL!;
-
-  return {
-    DATABASE_URL: process.env.DATABASE_URL!,
-    JWT_SECRET: process.env.JWT_SECRET!,
-    GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID!,
-    GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET!,
-    GITHUB_CALLBACK_URL: process.env.GITHUB_CALLBACK_URL || `${frontendUrl}/api/auth/github/callback`,
-    FRONTEND_URL: frontendUrl,
-    ADMIN_GITHUB_IDS: process.env.ADMIN_GITHUB_IDS!.split(',').map(id => id.trim()),
-    PORT: parseInt(process.env.PORT || '3000', 10),
-    NODE_ENV: process.env.NODE_ENV || 'development',
-  };
+  process.exit(1);
 }
 
-export const env = getEnv();
+const data = parsed.data;
+const frontendUrl = data.FRONTEND_URL;
+
+export const env = {
+  DATABASE_URL: data.DATABASE_URL,
+  JWT_SECRET: data.JWT_SECRET,
+  GITHUB_CLIENT_ID: data.GITHUB_CLIENT_ID,
+  GITHUB_CLIENT_SECRET: data.GITHUB_CLIENT_SECRET,
+  GITHUB_CALLBACK_URL: data.GITHUB_CALLBACK_URL || `${frontendUrl}/api/auth/github/callback`,
+  FRONTEND_URL: frontendUrl,
+  ADMIN_GITHUB_IDS: data.ADMIN_GITHUB_IDS.split(',').map(id => id.trim()),
+  PORT: parseInt(data.PORT, 10),
+  NODE_ENV: data.NODE_ENV,
+};
